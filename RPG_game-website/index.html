@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Quest - RPG Adventure</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    
+    <!-- Placeholder generator for dev purposes -->
+    <script>
+        // This script generates placeholder assets at runtime
+        window.addEventListener('load', () => {
+            // Create a placeholder tileset
+            createPlaceholderImage('assets/tilesets/fantasy-tileset.png', 256, 256, (ctx) => {
+                // Draw a grid of colored rectangles
+                const tileSize = 32;
+                const colors = ['#4a752c', '#8fca5c', '#3c5e34', '#77ad52', '#654321', '#8b4513', '#a9a9a9', '#696969'];
+                
+                for (let y = 0; y < 8; y++) {
+                    for (let x = 0; x < 8; x++) {
+                        const colorIndex = (x + y) % colors.length;
+                        ctx.fillStyle = colors[colorIndex];
+                        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+                        ctx.strokeStyle = '#ffffff';
+                        ctx.strokeRect(x * tileSize, y * tileSize, tileSize, tileSize);
+                    }
+                }
+            });
+            
+            // Create a player spritesheet
+            createPlaceholderImage('assets/characters/player.png', 384, 192, (ctx) => {
+                // Character sprite sheet: 8 columns x 4 rows, 48x48 each
+                const frameWidth = 48;
+                const frameHeight = 48;
+                const rows = 4;
+                const cols = 8;
+                
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        // Draw base character shape
+                        ctx.fillStyle = '#3498db'; // Blue for player
+                        ctx.fillRect(col * frameWidth + 8, row * frameHeight + 8, frameWidth - 16, frameHeight - 16);
+                        
+                        // Draw head
+                        ctx.fillStyle = '#f5deb3'; // Wheat color for skin
+                        ctx.fillRect(col * frameWidth + 16, row * frameHeight + 8, 16, 16);
+                        
+                        // Draw details based on animation frame
+                        if (row === 0) { // Walking down
+                            // Legs
+                            ctx.fillStyle = '#2980b9';
+                            ctx.fillRect(col * frameWidth + 16, row * frameHeight + 30, 8, 10);
+                            ctx.fillRect(col * frameWidth + 24, row * frameHeight + 30, 8, 10);
+                            
+                            // Arms position changes per frame
+                            const armOffset = col % 4;
+                            ctx.fillRect(col * frameWidth + 12, row * frameHeight + 20 + armOffset, 6, 10);
+                            ctx.fillRect(col * frameWidth + 30, row * frameHeight + 20 + (4 - armOffset) % 4, 6, 10);
+                        }
+                    }
+                }
+            });
+            
+            // Create an enemies spritesheet
+            createPlaceholderImage('assets/characters/enemies.png', 256, 128, (ctx) => {
+                // Enemy sprite sheet: 8 columns x 4 rows, 32x32 each
+                const frameWidth = 32;
+                const frameHeight = 32;
+                const rows = 4;
+                const cols = 8;
+                
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        // Draw base enemy shape - make each row a different enemy type
+                        const colors = ['#e74c3c', '#9b59b6', '#d35400', '#c0392b'];
+                        ctx.fillStyle = colors[row % colors.length];
+                        
+                        // Draw slime body
+                        if (row === 0) {
+                            const bounceOffset = col % 4;
+                            ctx.beginPath();
+                            ctx.ellipse(
+                                col * frameWidth + frameWidth/2, 
+                                row * frameHeight + frameHeight - 10 - bounceOffset, 
+                                frameWidth/2 - 4, 
+                                frameHeight/2 - 2 + bounceOffset, 
+                                0, 0, Math.PI * 2
+                            );
+                            ctx.fill();
+                            
+                            // Draw eyes
+                            ctx.fillStyle = 'white';
+                            ctx.beginPath();
+                            ctx.arc(col * frameWidth + 10, row * frameHeight + frameHeight - 15, 3, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.arc(col * frameWidth + 20, row * frameHeight + frameHeight - 15, 3, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                }
+            });
+            
+            // Create UI elements
+            createPlaceholderImage('assets/ui/button.png', 128, 64, (ctx) => {
+                // Draw a button with gradient
+                const gradient = ctx.createLinearGradient(0, 0, 0, 64);
+                gradient.addColorStop(0, '#3498db');
+                gradient.addColorStop(1, '#2980b9');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.roundRect(4, 4, 120, 56, 10);
+                ctx.fill();
+                
+                // Add button border
+                ctx.strokeStyle = '#1f618d';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.roundRect(4, 4, 120, 56, 10);
+                ctx.stroke();
+            });
+            
+            createPlaceholderImage('assets/ui/menu-background.jpg', 800, 600, (ctx) => {
+                // Create a fantasy background with gradient sky and mountains
+                const skyGradient = ctx.createLinearGradient(0, 0, 0, 400);
+                skyGradient.addColorStop(0, '#1a2980');
+                skyGradient.addColorStop(1, '#26d0ce');
+                
+                // Draw sky
+                ctx.fillStyle = skyGradient;
+                ctx.fillRect(0, 0, 800, 600);
+                
+                // Draw mountains
+                ctx.fillStyle = '#2c3e50';
+                
+                // First mountain range
+                ctx.beginPath();
+                ctx.moveTo(0, 400);
+                ctx.lineTo(200, 200);
+                ctx.lineTo(400, 350);
+                ctx.lineTo(600, 180);
+                ctx.lineTo(800, 300);
+                ctx.lineTo(800, 400);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Second mountain range
+                ctx.fillStyle = '#34495e';
+                ctx.beginPath();
+                ctx.moveTo(0, 400);
+                ctx.lineTo(100, 300);
+                ctx.lineTo(300, 380);
+                ctx.lineTo(500, 250);
+                ctx.lineTo(700, 350);
+                ctx.lineTo(800, 320);
+                ctx.lineTo(800, 400);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Ground
+                ctx.fillStyle = '#27ae60';
+                ctx.fillRect(0, 400, 800, 200);
+                
+                // Title text styling
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.fillRect(100, 50, 600, 120);
+            });
+            
+            // Create audio placeholders (these won't actually produce sound, just prevent errors)
+            createDummyAudio('assets/audio/title-theme.mp3');
+            createDummyAudio('assets/audio/game-theme.mp3');
+            createDummyAudio('assets/audio/sword-slash.mp3');
+            createDummyAudio('assets/audio/enemy-hit.mp3');
+        });
+        
+        function createPlaceholderImage(url, width, height, drawFunction) {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            
+            // Fill with checkerboard pattern to indicate it's a placeholder
+            const tileSize = 16;
+            for (let y = 0; y < canvas.height; y += tileSize) {
+                for (let x = 0; x < canvas.width; x += tileSize) {
+                    ctx.fillStyle = (x + y) % (tileSize * 2) === 0 ? '#eeeeee' : '#dddddd';
+                    ctx.fillRect(x, y, tileSize, tileSize);
+                }
+            }
+            
+            // Draw the custom content
+            if (drawFunction) {
+                drawFunction(ctx);
+            }
+            
+            // Convert to blob URL
+            canvas.toBlob(blob => {
+                const blobUrl = URL.createObjectURL(blob);
+                // Create a fake XHR response
+                const fakeImage = new Image();
+                fakeImage.src = blobUrl;
+                // Cache the blob URL for the given asset path
+                window.placeholderAssets = window.placeholderAssets || {};
+                window.placeholderAssets[url] = blobUrl;
+            });
+        }
+        
+        function createDummyAudio(url) {
+            // Create a silent audio blob
+            const arrayBuffer = new ArrayBuffer(16);
+            const blob = new Blob([arrayBuffer], { type: 'audio/mp3' });
+            const blobUrl = URL.createObjectURL(blob);
+            
+            // Cache the blob URL
+            window.placeholderAssets = window.placeholderAssets || {};
+            window.placeholderAssets[url] = blobUrl;
+        }
+        
+        // Override fetch to return our generated assets
+        const originalFetch = window.fetch;
+        window.fetch = function(url, options) {
+            if (window.placeholderAssets && window.placeholderAssets[url]) {
+                return originalFetch(window.placeholderAssets[url], options);
+            }
+            return originalFetch(url, options);
+        };
+    </script>
+</head>
+<body>
+    <div id="game-container"></div>
+    
+    <script src="js/config.js"></script>
+    <script src="js/scenes/BootScene.js"></script>
+    <script src="js/scenes/PreloadScene.js"></script>
+    <script src="js/scenes/MainMenuScene.js"></script>
+    <script src="js/scenes/GameScene.js"></script>
+    <script src="js/characters/Player.js"></script>
+    <script src="js/characters/Enemy.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
